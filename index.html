@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>רגע של שקט - הרגעה ומיקוד</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ocean-deep: #1a3a4a;
+            --ocean-mid: #2d5a6a;
+            --ocean-light: #4a8a9a;
+            --foam: #e8f4f8;
+            --calm-blue: #6ab7c8;
+            --gold: #ffd700;
+            --soft-green: #7ac7a0;
+            --soft-purple: #b8a9c9;
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: var(--ocean-deep);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--foam);
+        }
+
+        /* Soft Forest/Stream Background */
+        .bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(180deg, 
+                #1a3a4a 0%, 
+                #2d5a6a 40%, 
+                #3a7a7a 70%, 
+                #4a9a8a 100%);
+        }
+
+        /* Floating particles - soft */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: floatSoft 10s infinite ease-in-out;
+        }
+
+        @keyframes floatSoft {
+            0%, 100% { transform: translateY(0); opacity: 0; }
+            20% { opacity: 0.5; }
+            80% { opacity: 0.5; }
+            100% { transform: translateY(-50vh); opacity: 0; }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px 20px 120px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 20px rgba(106, 183, 200, 0.5);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        /* Initial State - centered */
+        #initialState {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Main Button - centered */
+        .main-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--calm-blue), var(--ocean-light));
+            border: none;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 
+                0 0 50px rgba(106, 183, 200, 0.4),
+                inset 0 -5px 20px rgba(0, 0, 0, 0.15),
+                inset 0 5px 20px rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-button:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 0 70px rgba(106, 183, 200, 0.5),
+                inset 0 -5px 20px rgba(0, 0, 0, 0.15),
+                inset 0 5px 20px rgba(255, 255, 255, 0.15);
+        }
+
+        .main-button:active {
+            transform: scale(0.98);
+        }
+
+        .main-button-text {
+            color: white;
+            font-family: 'Heebo', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        .delete-urge-label {
+            margin-top: 15px;
+            font-size: 1rem;
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        .main-button::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border-radius: 50%;
+            border: 2px solid rgba(106, 183, 200, 0.3);
+            animation: pulse-ring 2.5s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.15); opacity: 0; }
+        }
+
+        /* Breathing Circle */
+        .breathing-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .breathing-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(106, 183, 200, 0.9), 
+                rgba(74, 138, 154, 0.95));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 0 50px rgba(106, 183, 200, 0.5),
+                inset 0 0 30px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .breathing-circle.inhale {
+            animation: breatheIn 4s ease-in-out forwards;
+        }
+
+        .breathing-circle.exhale {
+            animation: breatheOut 4s ease-in-out forwards;
+        }
+
+        .breathing-circle.hold-full {
+            animation: holdFull 4s ease-in-out forwards;
+        }
+
+        .breathing-circle.hold-empty {
+            animation: holdEmpty 4s ease-in-out forwards;
+        }
+
+        @keyframes breatheIn {
+            from { transform: scale(1); }
+            to { transform: scale(1.25); }
+        }
+
+        @keyframes breatheOut {
+            from { transform: scale(1.25); }
+            to { transform: scale(1); }
+        }
+
+        @keyframes holdFull {
+            0%, 100% { transform: scale(1.25); box-shadow: 0 0 50px rgba(106, 183, 200, 0.5); }
+            50% { box-shadow: 0 0 70px rgba(106, 183, 200, 0.6); }
+        }
+
+        @keyframes holdEmpty {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 50px rgba(106, 183, 200, 0.5); }
+            50% { box-shadow: 0 0 70px rgba(106, 183, 200, 0.6); }
+        }
+
+        .breathing-text {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 500;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .seconds-display {
+            color: white;
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+            margin-top: 5px;
+        }
+
+        .breathing-instruction {
+            margin-top: 25px;
+            font-size: 1.1rem;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        .cycle-counter {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            opacity: 0.7;
+        }
+
+        /* Affirmations - non-judgmental */
+        .affirmation {
+            margin-top: 30px;
+            padding: 20px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            text-align: center;
+            max-width: 400px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .affirmation p {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .affirmation strong {
+            color: var(--calm-blue);
+            font-weight: 500;
+        }
+
+        /* Sound Toggle */
+        .sound-toggle {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .sound-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.08);
+        }
+
+        .sound-toggle svg {
+            width: 26px;
+            height: 26px;
+            fill: white;
+        }
+
+        .sound-toggle.muted svg {
+            opacity: 0.5;
+        }
+
+        /* Reset Button - fixed position */
+        .reset-all-button {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: rgba(255, 100, 100, 0.2);
+            border: 2px solid rgba(255, 100, 100, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .reset-all-button:hover {
+            background: rgba(255, 100, 100, 0.35);
+            transform: scale(1.08);
+        }
+
+        /* Sound Panel */
+        .sound-panel {
+            position: fixed;
+            bottom: 95px;
+            left: 25px;
+            background: rgba(26, 58, 74, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 101;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 160px;
+        }
+
+        .sound-panel.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .sound-panel-title {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-bottom: 5px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sound-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 10px 15px;
+            color: white;
+            font-family: 'Heebo', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: right;
+        }
+
+        .sound-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.02);
+        }
+
+        .sound-option.active {
+            background: rgba(106, 183, 200, 0.4);
+            border-color: var(--calm-blue);
+        }
+
+        /* Stop Button */
+        .stop-button {
+            margin-top: 25px;
+            padding: 14px 35px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 25px;
+            color: white;
+            font-family: 'Heebo', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .stop-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.03);
+        }
+
+        /* Completion Screen */
+        .completion {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .completion-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 25px;
+            background: linear-gradient(135deg, var(--soft-green), #5ab78a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 35px rgba(122, 199, 160, 0.5);
+            animation: celebratePulse 0.5s ease;
+        }
+
+        @keyframes celebratePulse {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .completion-icon svg {
+            width: 50px;
+            height: 50px;
+            fill: white;
+        }
+
+        .completion h2 {
+            font-size: 1.7rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .completion > p {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .restart-button {
+            padding: 16px 45px;
+            background: linear-gradient(135deg, var(--calm-blue), var(--ocean-light));
+            border: none;
+            border-radius: 28px;
+            color: white;
+            font-family: 'Heebo', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 25px rgba(106, 183, 200, 0.4);
+            margin-top: 25px;
+        }
+
+        .restart-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 30px rgba(106, 183, 200, 0.5);
+        }
+
+        /* Stats */
+        .stats {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            z-index: 50;
+        }
+
+        .stats p {
+            font-size: 0.9rem;
+            margin: 4px 0;
+        }
+
+        .stats span {
+            color: var(--calm-blue);
+            font-weight: 500;
+        }
+
+        /* Reward System - softer */
+        .reward-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, var(--soft-green), var(--soft-purple));
+            padding: 35px 50px;
+            border-radius: 25px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 80px rgba(122, 199, 160, 0.6);
+            animation: none;
+        }
+
+        .reward-popup.show {
+            animation: rewardPop 2s ease forwards;
+        }
+
+        @keyframes rewardPop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            40% { transform: translate(-50%, -50%) scale(1); }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+        }
+
+        .reward-popup h3 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .reward-popup p {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            top: -10px;
+            z-index: 999;
+            animation: confettiFall 3s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Streak - softer design */
+        .streak-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 18px;
+            padding: 12px 22px;
+            background: linear-gradient(135deg, var(--soft-green), #5ab78a);
+            border-radius: 18px;
+            box-shadow: 0 0 20px rgba(122, 199, 160, 0.4);
+        }
+
+        .streak-display span {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .streak-display .fire {
+            font-size: 1.6rem;
+        }
+
+        /* XP Bar */
+        .xp-container {
+            width: 100%;
+            max-width: 280px;
+            margin-top: 18px;
+        }
+
+        .xp-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .xp-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), #ffe066);
+            border-radius: 8px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .level-up {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 3.5rem;
+            z-index: 1001;
+            text-shadow: 0 0 40px var(--gold);
+        }
+
+        .level-up.show {
+            animation: levelUpPop 1.5s ease forwards;
+        }
+
+        @keyframes levelUpPop {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-10deg); }
+            30% { transform: translate(-50%, -50%) scale(1.2) rotate(5deg); }
+            50% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) scale(0) rotate(10deg); opacity: 0; }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 15px 100px;
+            }
+
+            .header {
+                margin-top: 60px;
+            }
+
+            .header h1 {
+                font-size: 1.7rem;
+            }
+
+            .main-button {
+                width: 170px;
+                height: 170px;
+            }
+
+            .main-button-text {
+                font-size: 1.1rem;
+            }
+
+            .breathing-circle {
+                width: 170px;
+                height: 170px;
+            }
+
+            .affirmation {
+                padding: 18px 20px;
+                margin: 25px 10px;
+            }
+
+            .affirmation p {
+                font-size: 1rem;
+            }
+
+            .stats {
+                position: relative;
+                margin-bottom: 15px;
+                top: 0;
+                left: 0;
+                width: calc(100% - 30px);
+            }
+
+            .sound-toggle, .reset-all-button {
+                width: 48px;
+                height: 48px;
+                bottom: 15px;
+            }
+
+            .sound-toggle {
+                left: 15px;
+            }
+
+            .reset-all-button {
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg"></div>
+
+    <div class="particles" id="particles"></div>
+
+    <div class="stats">
+        <p>התגברויות: <span id="urgesDefeated">0</span> 🌟</p>
+        <p>רמה: <span id="currentLevel">1</span> ⭐</p>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>💧 רגע של שקט</h1>
+            <p>קח נשימה עמוקה. אתה בשליטה.</p>
+        </div>
+
+        <!-- Initial State -->
+        <div id="initialState">
+            <button class="main-button" onclick="startBreathing()">
+                <span class="main-button-text">מחק את<br>הדחף להימור</span>
+            </button>
+            
+            <div class="delete-urge-label">👆 לחץ כאן כשמרגיש דחף</div>
+            
+            <div class="affirmation">
+                <p>💡 <strong>טיפ:</strong> לפני כל החלטה גדולה - קח 2 דקות לנשום. זה משנה הכל.</p>
+            </div>
+        </div>
+
+        <!-- Breathing State -->
+        <div class="breathing-container" id="breathingState">
+            <div class="breathing-circle" id="breathingCircle">
+                <span class="breathing-text" id="breathingText">שאיפה</span>
+                <span class="seconds-display" id="secondsDisplay">4</span>
+            </div>
+            <p class="breathing-instruction" id="breathingInstruction">נשום פנימה... הרגש את האוויר ממלא אותך</p>
+            <p class="cycle-counter">מחזור <span id="currentCycle">1</span> מתוך 4</p>
+            <button class="stop-button" onclick="stopBreathing()">סיום מוקדם</button>
+        </div>
+
+        <!-- Completion State -->
+        <div class="completion" id="completionState">
+            <div class="completion-icon">
+                <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <h2>יופי! סיימת את התרגיל 🎉</h2>
+            
+            <div class="streak-display" id="streakDisplay">
+                <span class="fire">✨</span>
+                <span id="streakCount">1</span>
+                <span>ברצף!</span>
+            </div>
+            
+            <div class="xp-container">
+                <div class="xp-label">
+                    <span>התקדמות</span>
+                    <span><span id="currentXP">0</span> / <span id="xpNeeded">100</span></span>
+                </div>
+                <div class="xp-bar">
+                    <div class="xp-fill" id="xpFill" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <p style="margin-top: 20px;">עצרת. נשמת. חשבת.<br>
+            זו הדרך לקבל החלטות טובות יותר.</p>
+            
+            <div class="affirmation">
+                <p id="randomAffirmation"></p>
+            </div>
+            
+            <button class="restart-button" onclick="resetToInitial()">חזרה להתחלה</button>
+        </div>
+    </div>
+
+    <!-- Reward Popup -->
+    <div class="reward-popup" id="rewardPopup">
+        <h3>+25 נקודות! 🌟</h3>
+        <p>כל צעד קטן נחשב</p>
+    </div>
+
+    <!-- Level Up -->
+    <div class="level-up" id="levelUp">🎖️ עלית רמה!</div>
+
+    <button class="sound-toggle" id="soundToggle" onclick="toggleSoundPanel()">
+        <svg id="soundIcon" viewBox="0 0 24 24">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+        </svg>
+    </button>
+
+    <!-- Sound Selection Panel -->
+    <div class="sound-panel" id="soundPanel">
+        <div class="sound-panel-title">בחר צליל מרגיע</div>
+        <button class="sound-option" onclick="selectSound('stream')" id="sound-stream">
+            💧 פכפוך מעיין
+        </button>
+        <button class="sound-option" onclick="selectSound('rain')" id="sound-rain">
+            🌧️ גשם עדין
+        </button>
+        <button class="sound-option" onclick="selectSound('ocean')" id="sound-ocean">
+            🌊 גלי ים
+        </button>
+        <button class="sound-option" onclick="selectSound('wind')" id="sound-wind">
+            🍃 רוח ביער
+        </button>
+        <button class="sound-option" onclick="selectSound('silence')" id="sound-silence">
+            🔇 שקט
+        </button>
+    </div>
+
+    <button class="reset-all-button" onclick="doReset()" title="איפוס כל הנתונים">🔄</button>
+
+    <script>
+        // ============ RESET FUNCTION - MUST BE FIRST ============
+        function doReset() {
+            alert('מאפס את כל הנתונים...');
+            localStorage.clear();
+            location.reload();
+        }
+
+        // ============ OTHER RESET FUNCTIONS ============
+        function resetToInitial() {
+            document.getElementById('completionState').style.display = 'none';
+            document.getElementById('breathingState').style.display = 'none';
+            document.getElementById('initialState').style.display = 'flex';
+            isBreathing = false;
+            currentCycle = 1;
+        }
+
+        // ============ VARIABLES ============
+        let isBreathing = false;
+        let currentCycle = 1;
+        let secondsLeft = 4;
+        let secondsInterval;
+        let audioContext;
+        let currentSound = 'stream';
+        let soundNodes = [];
+        let masterGain = null;
+
+        // ============ AFFIRMATIONS ============
+        const affirmations = [
+            "💪 <strong>כל פעם שאתה עוצר לחשוב</strong> - אתה מתחזק.",
+            "🎯 <strong>שאלה טובה לפני החלטה:</strong> האם זה משרת את המטרות שלי?",
+            "📊 <strong>תכנון = שקט נפשי.</strong> כשיש תוכנית, יש פחות חרדה.",
+            "🧘 <strong>הנשימה שלך</strong> היא הכלי הכי חזק שיש לך.",
+            "📝 <strong>לכתוב את המחשבות</strong> עוזר לראות אותן בבהירות.",
+            "⏰ <strong>אין מה למהר.</strong> ההזדמנויות הטובות לא בורחות.",
+            "🌟 <strong>עצרת. נשמת. זה כבר הישג.</strong>",
+            "💡 <strong>עקביות קטנה</strong> מנצחת מאמץ גדול וחד-פעמי.",
+            "🛡️ <strong>להגן על עצמך</strong> מהחלטות אימפולסיביות זה חוכמה.",
+            "🎓 <strong>למידה מטעויות</strong> היא חלק מהדרך להצלחה."
+        ];
+
+        // ============ PARTICLES ============
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = (50 + Math.random() * 50) + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (8 + Math.random() * 6) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // ============ SOUND SYSTEM ============
+        function toggleSoundPanel() {
+            const panel = document.getElementById('soundPanel');
+            panel.classList.toggle('show');
+        }
+
+        function stopAllSounds() {
+            soundNodes.forEach(node => {
+                try {
+                    if (node.source && node.source.stop) node.source.stop();
+                } catch(e) {}
+            });
+            soundNodes = [];
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+            masterGain = null;
+        }
+
+        function selectSound(soundType) {
+            // Update UI
+            document.querySelectorAll('.sound-option').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('sound-' + soundType).classList.add('active');
+            document.getElementById('soundToggle').classList.remove('muted');
+            
+            // Stop current sound
+            stopAllSounds();
+            
+            // Save selection
+            currentSound = soundType;
+            localStorage.setItem('selectedSound', soundType);
+            
+            // Start new sound
+            if (soundType !== 'silence') {
+                createSound(soundType);
+            }
+            
+            // Close panel
+            document.getElementById('soundPanel').classList.remove('show');
+        }
+
+        function createSound(type) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            masterGain = audioContext.createGain();
+            masterGain.gain.value = 0.25;
+            masterGain.connect(audioContext.destination);
+            
+            const bufferSize = 2 * audioContext.sampleRate;
+            const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            
+            // Create pink noise base
+            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+            for (let i = 0; i < bufferSize; i++) {
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                b3 = 0.86650 * b3 + white * 0.3104856;
+                b4 = 0.55000 * b4 + white * 0.5329522;
+                b5 = -0.7616 * b5 - white * 0.0168980;
+                output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+                b6 = white * 0.115926;
+            }
+            
+            const noise = audioContext.createBufferSource();
+            noise.buffer = noiseBuffer;
+            noise.loop = true;
+            
+            const filter = audioContext.createBiquadFilter();
+            const filter2 = audioContext.createBiquadFilter();
+            const gain = audioContext.createGain();
+            
+            // Different sound profiles
+            switch(type) {
+                case 'stream':
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 600;
+                    filter2.type = 'bandpass';
+                    filter2.frequency.value = 400;
+                    filter2.Q.value = 2;
+                    gain.gain.value = 0.35;
+                    break;
+                    
+                case 'rain':
+                    filter.type = 'highpass';
+                    filter.frequency.value = 400;
+                    filter2.type = 'lowpass';
+                    filter2.frequency.value = 3000;
+                    gain.gain.value = 0.3;
+                    break;
+                    
+                case 'ocean':
+                    filter.type = 'lowpass';
+                    filter.frequency.value = 350;
+                    filter2.type = 'lowpass';
+                    filter2.frequency.value = 500;
+                    gain.gain.value = 0.4;
+                    // Add wave modulation
+                    const lfo = audioContext.createOscillator();
+                    lfo.frequency.value = 0.08;
+                    const lfoGain = audioContext.createGain();
+                    lfoGain.gain.value = 150;
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(filter.frequency);
+                    lfo.start();
+                    soundNodes.push({ source: lfo });
+                    break;
+                    
+                case 'wind':
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 300;
+                    filter.Q.value = 0.5;
+                    filter2.type = 'lowpass';
+                    filter2.frequency.value = 800;
+                    gain.gain.value = 0.25;
+                    // Add wind gusts
+                    const windLfo = audioContext.createOscillator();
+                    windLfo.frequency.value = 0.12;
+                    const windGain = audioContext.createGain();
+                    windGain.gain.value = 200;
+                    windLfo.connect(windGain);
+                    windGain.connect(filter.frequency);
+                    windLfo.start();
+                    soundNodes.push({ source: windLfo });
+                    break;
+            }
+            
+            noise.connect(filter);
+            filter.connect(filter2);
+            filter2.connect(gain);
+            gain.connect(masterGain);
+            noise.start();
+            
+            soundNodes.push({ source: noise, gain: gain, masterGain: masterGain });
+        }
+
+        // ============ COUNTDOWN ============
+        function startCountdown(duration, callback) {
+            secondsLeft = duration;
+            document.getElementById('secondsDisplay').textContent = secondsLeft;
+            
+            if (secondsInterval) clearInterval(secondsInterval);
+            
+            secondsInterval = setInterval(() => {
+                secondsLeft--;
+                if (secondsLeft >= 0) {
+                    document.getElementById('secondsDisplay').textContent = secondsLeft;
+                }
+                if (secondsLeft <= 0) {
+                    clearInterval(secondsInterval);
+                    if (callback) callback();
+                }
+            }, 1000);
+        }
+
+        // ============ BREATHING ============
+        function startBreathing() {
+            // Start sound if not playing
+            if (!audioContext && currentSound !== 'silence') {
+                createSound(currentSound);
+            }
+            
+            document.getElementById('initialState').style.display = 'none';
+            document.getElementById('breathingState').style.display = 'flex';
+            isBreathing = true;
+            currentCycle = 1;
+            
+            runBreathingCycle();
+        }
+
+        function runBreathingCycle() {
+            if (!isBreathing) return;
+            
+            const circle = document.getElementById('breathingCircle');
+            const text = document.getElementById('breathingText');
+            const instruction = document.getElementById('breathingInstruction');
+            
+            document.getElementById('currentCycle').textContent = currentCycle;
+            
+            // Inhale - 4 seconds
+            circle.className = 'breathing-circle inhale';
+            text.textContent = 'שאיפה';
+            instruction.textContent = 'נשום פנימה... הרגש את האוויר ממלא אותך';
+            
+            startCountdown(4, () => {
+                if (!isBreathing) return;
+                
+                // Hold full - 4 seconds
+                circle.className = 'breathing-circle hold-full';
+                text.textContent = 'החזק';
+                instruction.textContent = 'החזק את הנשימה... הרגש את הרגע';
+                
+                startCountdown(4, () => {
+                    if (!isBreathing) return;
+                    
+                    // Exhale - 4 seconds
+                    circle.className = 'breathing-circle exhale';
+                    text.textContent = 'נשיפה';
+                    instruction.textContent = 'נשוף החוצה... שחרר את המתח';
+                    
+                    startCountdown(4, () => {
+                        if (!isBreathing) return;
+                        
+                        // Hold empty - 4 seconds (circle stays small)
+                        circle.className = 'breathing-circle hold-empty';
+                        text.textContent = 'המתן';
+                        instruction.textContent = 'רגע של שקט... הרגש את הרוגע';
+                        
+                        startCountdown(4, () => {
+                            if (!isBreathing) return;
+                            
+                            currentCycle++;
+                            if (currentCycle <= 4) {
+                                runBreathingCycle();
+                            } else {
+                                completeBreathing();
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        function stopBreathing() {
+            isBreathing = false;
+            if (secondsInterval) clearInterval(secondsInterval);
+            completeBreathing();
+        }
+
+        // ============ CONFETTI ============
+        function createConfetti() {
+            const colors = ['#7ac7a0', '#b8a9c9', '#ffd700', '#6ab7c8', '#a8d8ea', '#f6d55c'];
+            for (let i = 0; i < 35; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDuration = (2.5 + Math.random() * 2) + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 4500);
+                }, i * 60);
+            }
+        }
+
+        // ============ REWARDS ============
+        function showReward() {
+            const popup = document.getElementById('rewardPopup');
+            popup.classList.add('show');
+            setTimeout(() => popup.classList.remove('show'), 2000);
+        }
+
+        function checkLevelUp(xp, level) {
+            const xpNeeded = level * 100;
+            if (xp >= xpNeeded) {
+                const newLevel = level + 1;
+                localStorage.setItem('currentLevel', newLevel);
+                localStorage.setItem('currentXP', xp - xpNeeded);
+                
+                const levelUp = document.getElementById('levelUp');
+                levelUp.classList.add('show');
+                setTimeout(() => levelUp.classList.remove('show'), 1500);
+                
+                return { newLevel, newXP: xp - xpNeeded };
+            }
+            return { newLevel: level, newXP: xp };
+        }
+
+        function completeBreathing() {
+            isBreathing = false;
+            if (secondsInterval) clearInterval(secondsInterval);
+            
+            let urges = parseInt(localStorage.getItem('urgesDefeated') || '0');
+            let xp = parseInt(localStorage.getItem('currentXP') || '0');
+            let level = parseInt(localStorage.getItem('currentLevel') || '1');
+            let streak = parseInt(localStorage.getItem('streak') || '0');
+            let lastDate = localStorage.getItem('lastDate');
+            
+            const today = new Date().toDateString();
+            
+            if (lastDate === today) {
+                // Same day
+            } else if (lastDate === new Date(Date.now() - 86400000).toDateString()) {
+                streak++;
+            } else {
+                streak = 1;
+            }
+            
+            urges++;
+            xp += 25;
+            
+            localStorage.setItem('urgesDefeated', urges);
+            localStorage.setItem('streak', streak);
+            localStorage.setItem('lastDate', today);
+            localStorage.setItem('currentXP', xp);
+            
+            const result = checkLevelUp(xp, level);
+            xp = result.newXP;
+            level = result.newLevel;
+            
+            document.getElementById('urgesDefeated').textContent = urges;
+            document.getElementById('currentLevel').textContent = level;
+            document.getElementById('streakCount').textContent = streak;
+            document.getElementById('currentXP').textContent = xp;
+            document.getElementById('xpNeeded').textContent = level * 100;
+            document.getElementById('xpFill').style.width = (xp / (level * 100)) * 100 + '%';
+            
+            const randomIndex = Math.floor(Math.random() * affirmations.length);
+            document.getElementById('randomAffirmation').innerHTML = affirmations[randomIndex];
+            
+            document.getElementById('breathingState').style.display = 'none';
+            document.getElementById('completionState').style.display = 'block';
+            
+            createConfetti();
+            setTimeout(showReward, 500);
+        }
+
+        // ============ INIT ============
+        function init() {
+            createParticles();
+            
+            // Load stats
+            const urges = localStorage.getItem('urgesDefeated') || '0';
+            const level = localStorage.getItem('currentLevel') || '1';
+            const xp = localStorage.getItem('currentXP') || '0';
+            const streak = localStorage.getItem('streak') || '0';
+            
+            document.getElementById('urgesDefeated').textContent = urges;
+            document.getElementById('currentLevel').textContent = level;
+            document.getElementById('streakCount').textContent = streak;
+            document.getElementById('currentXP').textContent = xp;
+            document.getElementById('xpNeeded').textContent = parseInt(level) * 100;
+            document.getElementById('xpFill').style.width = (parseInt(xp) / (parseInt(level) * 100)) * 100 + '%';
+            
+            // Load saved sound preference
+            const savedSound = localStorage.getItem('selectedSound') || 'stream';
+            currentSound = savedSound;
+            document.getElementById('sound-' + savedSound).classList.add('active');
+            
+            // Close sound panel when clicking outside
+            document.addEventListener('click', function(e) {
+                const panel = document.getElementById('soundPanel');
+                const toggle = document.getElementById('soundToggle');
+                if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+                    panel.classList.remove('show');
+                }
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
